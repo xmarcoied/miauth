@@ -9,31 +9,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const LoggerRequestID = "RequestID"
-
 const (
 	ErrInternal                     = 0 // any internal error
-	ErrDecode                       = 2 // failed to unmarshal incoming request
-	ErrNoAccess                     = 3 // rejected by auth
-	ErrExternalServerDoesNotRespond = 4 // external server does not respond
-	ErrRequestValidation            = 5 // api server returns 400 error
-	ErrInvalidCreditCard            = 6 // invalid credit card
-	ErrRequiresCreditCardAction     = 7 // invalid credit card
+	ErrDecode                       = 1 // failed to unmarshal incoming request
+	ErrExternalServerDoesNotRespond = 2 // external server does not respond
+	ErrRequestValidation            = 3 // api server returns 400 error
 )
 
 type JSON map[string]interface{}
 
-type key string
-
-func createKey(name string) key {
-	return key("OLARM_CTX_" + name)
-}
-
 var (
-	RequestID        = createKey("REQUEST_ID")
-	LoggerKey        = createKey("LOGGER_KEY")
-	StripeCustomerID = createKey("STRIPE_CUSTOMER_ID")
-	UserID           = createKey("USER_ID")
+	RequestID = "REQUEST_ID"
 )
 
 type uuidHex string
@@ -51,18 +37,18 @@ func GenerateNewStringUUID() string {
 
 //GetLogRequest returns a request logger
 func GetLogRequest(r *http.Request) *logrus.Entry {
-	log := r.Context().Value(LoggerKey)
+	log := r.Context().Value(RequestID)
 	if log == nil {
-		return logrus.WithField(LoggerRequestID, "not-set")
+		return logrus.WithField(RequestID, "not-set")
 	}
 	return log.(*logrus.Entry)
 }
 
 //GetLogContext returns a context logger
 func GetLogContext(ctx context.Context) *logrus.Entry {
-	log := ctx.Value(LoggerKey)
+	log := ctx.Value(RequestID)
 	if log == nil {
-		return logrus.WithField(LoggerRequestID, "not-set")
+		return logrus.WithField(RequestID, "not-set")
 	}
 	return log.(*logrus.Entry)
 }

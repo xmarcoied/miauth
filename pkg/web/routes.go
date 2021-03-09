@@ -1,9 +1,18 @@
 package web
 
-import "github.com/go-chi/chi"
+import (
+	"context"
+	"net/http"
+
+	"github.com/go-chi/chi"
+	log "github.com/sirupsen/logrus"
+	"github.com/xmarcoied/miauth/pkg"
+)
 
 func (s *Engine) routes() chi.Router {
 	router := chi.NewRouter()
+
+	router.Use(UseRequestID("Request_ID"))
 
 	//routes
 	router.Route("/api/v1", func(rapi chi.Router) {
@@ -20,4 +29,27 @@ func (s *Engine) routes() chi.Router {
 		})
 	})
 	return router
+}
+
+// UseRequestID middleware adds request-id to the context
+func UseRequestID(headerName string) func(http.Handler) http.Handler {
+	f := func(h http.Handler) http.Handler {
+		fn := func(w http.ResponseWriter, r *http.Request) {
+			var reqID string
+			if reqID = r.Header.Get(headerName); reqID == "" {
+				// first occurrence
+				reqID = pkg.GenerateNewStringUUID()
+			}
+			ctx := r.Context()
+			ctx = context.WithValue(ctx, pkg.RequestID, reqID)
+
+			// setup logger
+			requestLogger := log.WithField(pkg.RequestID, reqID)
+			ctx = context.WithValue(ctx, pkg.RequestID, requestLogger)
+
+			h.ServeHTTP(w, r.WithContext(ctx))
+		}
+		return http.HandlerFunc(fn)
+	}
+	return f
 }

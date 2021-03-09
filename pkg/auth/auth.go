@@ -2,8 +2,11 @@ package auth
 
 import (
 	"context"
+	"time"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/xmarcoied/miauth/models"
+	"github.com/xmarcoied/miauth/pkg"
 	"github.com/xmarcoied/miauth/services/storage"
 )
 
@@ -21,15 +24,35 @@ func NewService(userinterface storage.UsersInterface) *Service {
 
 // CreateUser create a new user and return the created user info
 func (s *Service) CreateUser(ctx context.Context, username, password string) (models.User, error) {
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
 	hashPassword, err := s.GenerateHashPassword(password)
 	if err != nil {
+		pkg.GetLogContext(ctx).WithError(err).WithFields(log.Fields{
+			"user": username,
+		}).Error("cannot create a new user")
 		return models.User{}, err
 	}
-	return s.storage.CreateUser(ctx, username, hashPassword)
+	user, err := s.storage.CreateUser(ctx, username, hashPassword)
+	if err != nil {
+		pkg.GetLogContext(ctx).WithError(err).WithFields(log.Fields{
+			"user": username,
+		}).Error("cannot create a new user")
+		return models.User{}, err
+	}
+
+	pkg.GetLogContext(ctx).WithFields(log.Fields{
+		"user": username,
+	}).Info("new user created")
+
+	return user, nil
 }
 
 // Login connects a user against datastore
-func (s *Service) Login() {}
+func (s *Service) Login() error {
+	return nil
+}
 
 // UpdateUser updates user info
 func (s *Service) UpdateUser() {}
