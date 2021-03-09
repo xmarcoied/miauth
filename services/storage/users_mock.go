@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"errors"
 
 	"github.com/xmarcoied/miauth/models"
 )
@@ -20,16 +19,26 @@ func NewMockedUser(store []models.User) *MockedUser {
 
 func (m *MockedUser) CreateUser(ctx context.Context, username, password string) (models.User, error) {
 	if m.IsUserExist(username) {
-		return models.User{}, errors.New("Already exist")
+		return models.User{}, ErrAlreadyExist
 	}
 
 	user := models.User{
 		Username: username,
-		Password: "password",
+		Password: password,
 	}
 	m.datastore = append(m.datastore, user)
 
 	return user, nil
+}
+
+func (m *MockedUser) GetUser(ctx context.Context, username string) (models.User, error) {
+	for _, user := range m.datastore {
+		if user.Username == username {
+			return user, nil
+		}
+	}
+
+	return models.User{}, ErrNotFound
 }
 
 func (m *MockedUser) IsUserExist(username string) bool {

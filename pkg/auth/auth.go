@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -50,7 +51,23 @@ func (s *Service) CreateUser(ctx context.Context, req CreateUserRequest) (models
 }
 
 // Login connects a user against datastore
-func (s *Service) Login() error {
+func (s *Service) Login(ctx context.Context, req LoginRequest) error {
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
+	user, err := s.storage.GetUser(ctx, req.Username)
+	if err != nil {
+		pkg.GetLogContext(ctx).WithError(err).WithFields(log.Fields{
+			"user": req.Username,
+		}).Error("user is not found")
+		return err
+	}
+
+	isValid, _ := s.IsHashPasswordValid(user.Password, req.Password)
+	if !isValid {
+		return errors.New("password is not valid")
+	}
+
 	return nil
 }
 
