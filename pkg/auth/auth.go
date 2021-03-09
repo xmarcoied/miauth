@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/xmarcoied/miauth/models"
 	"github.com/xmarcoied/miauth/pkg"
+	"github.com/xmarcoied/miauth/pkg/rand"
 	"github.com/xmarcoied/miauth/services/storage"
 )
 
@@ -90,18 +91,57 @@ func (s *Service) UpdateUser(ctx context.Context, username string, req UpdateUse
 		return err
 	}
 
-	s.storage.UpdateUser(ctx, username, models.User{
+	log.Println(req)
+
+	err = s.storage.UpdateUser(ctx, username, models.User{
 		Username:  user.Username,
 		Password:  user.Password,
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
 	})
 
-	return nil
+	return err
 }
 
 // ChangePassword changes user's password
-func (s *Service) ChangePassword() {}
+func (s *Service) ChangePassword() error {
+	return nil
+}
 
 // ResetPassword resets user's password to a new randomized password
-func (s *Service) ResetPassword() {}
+func (s *Service) ResetPassword(ctx context.Context, username string) (string, error) {
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
+	user, err := s.storage.GetUser(ctx, username)
+	if err != nil {
+		pkg.GetLogContext(ctx).WithError(err).WithFields(log.Fields{
+			"user": username,
+		}).Error("user is not found")
+		return "", err
+	}
+
+	newpassword := rand.String(10)
+	hashPassword, err := s.GenerateHashPassword(newpassword)
+	if err != nil {
+		pkg.GetLogContext(ctx).WithError(err).WithFields(log.Fields{
+			"user": username,
+		}).Error("cannot create a new user")
+		return "", err
+	}
+
+	err = s.storage.UpdateUser(ctx, username, models.User{
+		Username:  username,
+		Password:  hashPassword,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+	})
+	if err != nil {
+		pkg.GetLogContext(ctx).WithError(err).WithFields(log.Fields{
+			"user": username,
+		}).Error("user cannot update")
+		return "", err
+	}
+
+	return newpassword, nil
+}

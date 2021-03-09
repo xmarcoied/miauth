@@ -97,7 +97,19 @@ func (s *Service) UpdateUserCtrl(w http.ResponseWriter, r *http.Request) {
 
 // ResetPasswordCtrl resets user's password
 func (s *Service) ResetPasswordCtrl(w http.ResponseWriter, r *http.Request) {
+	username := chi.URLParam(r, "username")
+
+	password, err := s.AuthService.ResetPassword(r.Context(), username)
+	if err != nil {
+		handlers.RenderJSONError(w, r, http.StatusBadRequest, &pkg.Error{
+			Code: pkg.ErrInternal,
+			Msg:  err.Error(),
+		})
+		return
+	}
+
 	render.Status(r, http.StatusOK)
+	render.JSON(w, r, map[string]interface{}{"new_password": password})
 	return
 }
 

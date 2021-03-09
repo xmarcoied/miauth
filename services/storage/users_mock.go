@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"log"
 
 	"github.com/xmarcoied/miauth/models"
 )
@@ -28,6 +29,7 @@ func (m *MockedUser) CreateUser(ctx context.Context, user models.User) (models.U
 }
 
 func (m *MockedUser) GetUser(ctx context.Context, username string) (models.User, error) {
+	log.Println(m.datastore)
 	for _, user := range m.datastore {
 		if user.Username == username {
 			return user, nil
@@ -37,11 +39,12 @@ func (m *MockedUser) GetUser(ctx context.Context, username string) (models.User,
 	return models.User{}, ErrNotFound
 }
 
-func (m *MockedUser) UpdateUser(ctx context.Context, username string, user models.User) error {
+func (m *MockedUser) UpdateUser(ctx context.Context, username string, newuser models.User) error {
 	for i, user := range m.datastore {
 		if user.Username == username {
-			m.datastore[i].FirstName = user.FirstName
-			m.datastore[i].LastName = user.LastName
+			m.datastore[i].FirstName = newuser.FirstName
+			m.datastore[i].LastName = newuser.LastName
+			m.datastore[i].Password = newuser.Password
 			return nil
 		}
 	}
