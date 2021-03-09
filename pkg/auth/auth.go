@@ -78,7 +78,27 @@ func (s *Service) Login(ctx context.Context, req LoginRequest) error {
 }
 
 // UpdateUser updates user info
-func (s *Service) UpdateUser() {}
+func (s *Service) UpdateUser(ctx context.Context, username string, req UpdateUserRequest) error {
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
+	user, err := s.storage.GetUser(ctx, username)
+	if err != nil {
+		pkg.GetLogContext(ctx).WithError(err).WithFields(log.Fields{
+			"user": username,
+		}).Error("user is not found")
+		return err
+	}
+
+	s.storage.UpdateUser(ctx, username, models.User{
+		Username:  user.Username,
+		Password:  user.Password,
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+	})
+
+	return nil
+}
 
 // ChangePassword changes user's password
 func (s *Service) ChangePassword() {}

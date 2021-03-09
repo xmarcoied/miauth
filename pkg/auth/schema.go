@@ -23,3 +23,11 @@ type LoginRequest struct {
 	// required: true
 	Password string `json:"password" validate:"required"`
 }
+
+// UpdateUserRequest
+//
+// swagger:model
+type UpdateUserRequest struct {
+	FirstName string `json:"first_name,omitempty"`
+	LastName  string `json:"last_name,omitempty"`
+}

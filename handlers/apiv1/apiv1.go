@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"github.com/xmarcoied/miauth/handlers"
 	"github.com/xmarcoied/miauth/pkg"
@@ -71,6 +72,25 @@ func (s *Service) LoginCtrl(w http.ResponseWriter, r *http.Request) {
 
 // UpdateUserCtrl updates user's info
 func (s *Service) UpdateUserCtrl(w http.ResponseWriter, r *http.Request) {
+	var entity auth.UpdateUserRequest
+	if err := handlers.BindTo(w, r, &entity); err != nil {
+		return
+	}
+	if err := handlers.Validation(w, r, entity); err != nil {
+		return
+	}
+
+	username := chi.URLParam(r, "username")
+
+	err := s.AuthService.UpdateUser(r.Context(), username, entity)
+	if err != nil {
+		handlers.RenderJSONError(w, r, http.StatusBadRequest, &pkg.Error{
+			Code: pkg.ErrInternal,
+			Msg:  err.Error(),
+		})
+		return
+	}
+
 	render.Status(r, http.StatusOK)
 	return
 }

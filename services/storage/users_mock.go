@@ -37,6 +37,18 @@ func (m *MockedUser) GetUser(ctx context.Context, username string) (models.User,
 	return models.User{}, ErrNotFound
 }
 
+func (m *MockedUser) UpdateUser(ctx context.Context, username string, user models.User) error {
+	for i, user := range m.datastore {
+		if user.Username == username {
+			m.datastore[i].FirstName = user.FirstName
+			m.datastore[i].LastName = user.LastName
+			return nil
+		}
+	}
+
+	return ErrNotFound
+}
+
 func (m *MockedUser) IsUserExist(username string) bool {
 	for _, user := range m.datastore {
 		if user.Username == username {
