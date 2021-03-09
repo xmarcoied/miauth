@@ -3,7 +3,7 @@ package auth
 import "golang.org/x/crypto/bcrypt"
 
 //GenerateHashPassword generates a password hash
-func (s *AuthService) GenerateHashPassword(passowrd string) (string, error) {
+func (s *Service) GenerateHashPassword(passowrd string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(passowrd), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
@@ -12,7 +12,7 @@ func (s *AuthService) GenerateHashPassword(passowrd string) (string, error) {
 }
 
 //IsHashPasswordValid compares a password and a hash
-func (s *AuthService) IsHashPasswordValid(hashedPassword, plainPassword string) (bool, error) {
+func (s *Service) IsHashPasswordValid(hashedPassword, plainPassword string) (bool, error) {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword))
 	if err == nil {
 		return true, nil

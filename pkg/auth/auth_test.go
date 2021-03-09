@@ -9,7 +9,7 @@ import (
 	"github.com/xmarcoied/miauth/services/storage"
 )
 
-func TestAuthService_CreateUser(t *testing.T) {
+func TestService_CreateUser(t *testing.T) {
 	type fields struct {
 		storage storage.UsersInterface
 	}
@@ -62,16 +62,16 @@ func TestAuthService_CreateUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &AuthService{
+			s := &Service{
 				storage: tt.fields.storage,
 			}
 			got, err := s.CreateUser(tt.args.ctx, tt.args.username, tt.args.password)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AuthService.CreateUser() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Service.CreateUser() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("AuthService.CreateUser() = %v, want %v", got, tt.want)
+				t.Errorf("Service.CreateUser() = %v, want %v", got, tt.want)
 			}
 		})
 	}

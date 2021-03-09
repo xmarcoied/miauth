@@ -7,18 +7,18 @@ import (
 	"github.com/xmarcoied/miauth/services/storage"
 )
 
-// AuthService defines the auth main service
-type AuthService struct {
+// Service defines the auth main service
+type Service struct {
 	storage storage.UsersInterface
 }
 
-func NewAuthService(userinterface storage.UsersInterface) *AuthService {
-	return &AuthService{
+func NewService(userinterface storage.UsersInterface) *Service {
+	return &Service{
 		storage: userinterface,
 	}
 }
 
-func (s *AuthService) CreateUser(ctx context.Context, username, password string) (models.User, error) {
+func (s *Service) CreateUser(ctx context.Context, username, password string) (models.User, error) {
 	hashPassword, err := s.GenerateHashPassword(password)
 	if err != nil {
 		return models.User{}, err
@@ -26,7 +26,7 @@ func (s *AuthService) CreateUser(ctx context.Context, username, password string)
 	return s.storage.CreateUser(ctx, username, hashPassword)
 }
 
-func (s *AuthService) Login()          {}
-func (s *AuthService) UpdateUser()     {}
-func (s *AuthService) ChangePassword() {}
-func (s *AuthService) ResetPassword()  {}
+func (s *Service) Login()          {}
+func (s *Service) UpdateUser()     {}
+func (s *Service) ChangePassword() {}
+func (s *Service) ResetPassword()  {}
