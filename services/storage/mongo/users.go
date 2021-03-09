@@ -10,19 +10,21 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+func (s *Service) users() *mongo.Collection {
+	return s.client.Database("testing").Collection("users")
+}
+
 func (s *Service) CreateUser(ctx context.Context, user models.User) (models.User, error) {
 	if s.IsUserExist(ctx, user.Username) {
 		return models.User{}, storage.ErrAlreadyExist
 	}
-	s.client.Database("testing").Collection("users").
-		InsertOne(ctx, user)
+	s.users().InsertOne(ctx, user)
 
 	return models.User{}, nil
 }
 func (s *Service) GetUser(ctx context.Context, username string) (models.User, error) {
 	user := models.User{}
-	err := s.client.Database("testing").Collection("users").
-		FindOne(ctx, bson.D{{"username", username}}).Decode(&user)
+	err := s.users().FindOne(ctx, bson.D{{"username", username}}).Decode(&user)
 
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -33,8 +35,7 @@ func (s *Service) GetUser(ctx context.Context, username string) (models.User, er
 	return user, nil
 }
 func (s *Service) UpdateUser(ctx context.Context, username string, user models.User) error {
-	_, err := s.client.Database("testing").Collection("users").
-		UpdateOne(ctx, bson.D{{"username", username}}, bson.M{"$set": user})
+	_, err := s.users().UpdateOne(ctx, bson.D{{"username", username}}, bson.M{"$set": user})
 
 	if err != nil {
 		return err
@@ -44,8 +45,7 @@ func (s *Service) UpdateUser(ctx context.Context, username string, user models.U
 }
 
 func (s *Service) IsUserExist(ctx context.Context, username string) bool {
-	err := s.client.Database("testing").Collection("users").
-		FindOne(ctx, bson.D{{"username", username}}).Err()
+	err := s.users().FindOne(ctx, bson.D{{"username", username}}).Err()
 
 	return !errors.Is(err, mongo.ErrNoDocuments)
 }
