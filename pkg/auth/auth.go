@@ -12,12 +12,14 @@ type Service struct {
 	storage storage.UsersInterface
 }
 
+// NewService initiatize the main Auth service with storage interface
 func NewService(userinterface storage.UsersInterface) *Service {
 	return &Service{
 		storage: userinterface,
 	}
 }
 
+// CreateUser create a new user and return the created user info
 func (s *Service) CreateUser(ctx context.Context, username, password string) (models.User, error) {
 	hashPassword, err := s.GenerateHashPassword(password)
 	if err != nil {
@@ -26,7 +28,14 @@ func (s *Service) CreateUser(ctx context.Context, username, password string) (mo
 	return s.storage.CreateUser(ctx, username, hashPassword)
 }
 
-func (s *Service) Login()          {}
-func (s *Service) UpdateUser()     {}
+// Login connects a user against datastore
+func (s *Service) Login() {}
+
+// UpdateUser updates user info
+func (s *Service) UpdateUser() {}
+
+// ChangePassword changes user's password
 func (s *Service) ChangePassword() {}
-func (s *Service) ResetPassword()  {}
+
+// ResetPassword resets user's password to a new randomized password
+func (s *Service) ResetPassword() {}
