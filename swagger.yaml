@@ -1,0 +1,135 @@
+basePath: /api/v1
+consumes:
+- application/json
+definitions:
+  CreateUserRequest:
+    description: CreateUserRequest
+    properties:
+      confirm_password:
+        type: string
+        x-go-name: ConfirmPassword
+      first_name:
+        type: string
+        x-go-name: FirstName
+      last_name:
+        type: string
+        x-go-name: LastName
+      password:
+        type: string
+        x-go-name: Password
+      username:
+        type: string
+        x-go-name: Username
+    required:
+    - password
+    - confirm_password
+    - username
+    type: object
+    x-go-package: github.com/xmarcoied/miauth/pkg/auth
+  LoginRequest:
+    description: LoginRequest
+    properties:
+      password:
+        type: string
+        x-go-name: Password
+      username:
+        type: string
+        x-go-name: Username
+    required:
+    - username
+    - password
+    type: object
+    x-go-package: github.com/xmarcoied/miauth/pkg/auth
+  UpdateUserRequest:
+    description: UpdateUserRequest
+    properties:
+      first_name:
+        type: string
+        x-go-name: FirstName
+      last_name:
+        type: string
+        x-go-name: LastName
+    type: object
+    x-go-package: github.com/xmarcoied/miauth/pkg/auth
+host: https://NONE
+info:
+  description: This documentation describes miauth APIs
+  title: Auth microservice
+  version: 1.0.1
+paths:
+  /user/:
+    post:
+      description: Create a new user
+      operationId: CreateUser
+      parameters:
+      - description: user's params
+        in: body
+        name: user
+        schema:
+          $ref: '#/definitions/CreateUserRequest'
+      responses:
+        "201":
+          description: user is created
+        "409":
+          description: user already exist
+        "500":
+          description: unexpected error
+      tags:
+      - user
+  /user/{username}/:
+    put:
+      description: Update user info
+      operationId: UpdateUser
+      parameters:
+      - description: user's params
+        in: body
+        name: user
+        schema:
+          $ref: '#/definitions/UpdateUserRequest'
+      responses:
+        "200":
+          description: user is updated
+        "500":
+          description: unexpected error
+      tags:
+      - user
+  /user/{username}/reset_password:
+    post:
+      description: Reset user's password
+      operationId: ResetPassword
+      parameters:
+      - description: username
+        in: path
+        name: username
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: new password
+        "500":
+          description: unexpected error
+      tags:
+      - user
+  /user/login/:
+    post:
+      operationId: Login
+      parameters:
+      - description: user's params
+        in: body
+        name: user
+        schema:
+          $ref: '#/definitions/LoginRequest'
+      responses:
+        "201":
+          description: user is logged in
+        "500":
+          description: unexpected error
+      summary: Logging with user's cred.
+      tags:
+      - user
+produces:
+- application/json
+schemes:
+- https
+swagger: "2.0"
