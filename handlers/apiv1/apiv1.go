@@ -19,6 +19,24 @@ type Service struct {
 
 // CreateUserCtrl creates a new user
 func (s *Service) CreateUserCtrl(w http.ResponseWriter, r *http.Request) {
+	// swagger:operation POST /user/ user CreateUser
+	//
+	// Create a new user
+	//
+	// ---
+	// parameters:
+	// - name: user
+	//   in: body
+	//   description: user's params
+	//   schema:
+	//	   "$ref": "#/definitions/CreateUserRequest"
+	// responses:
+	//   "201":
+	//     description: user is created
+	//   "409":
+	//	   description: user already exist
+	//   "500":
+	//	   description: unexpected error
 	var entity auth.CreateUserRequest
 	if err := handlers.BindTo(w, r, &entity); err != nil {
 		return
@@ -49,6 +67,22 @@ func (s *Service) CreateUserCtrl(w http.ResponseWriter, r *http.Request) {
 
 // LoginCtrl tries to login with username and password
 func (s *Service) LoginCtrl(w http.ResponseWriter, r *http.Request) {
+	// swagger:operation POST /user/login/ user Login
+	//
+	// Logging with user's cred.
+	//
+	// ---
+	// parameters:
+	// - name: user
+	//   in: body
+	//   description: user's params
+	//   schema:
+	//	   "$ref": "#/definitions/LoginRequest"
+	// responses:
+	//   "201":
+	//     description: user is logged in
+	//   "500":
+	//	   description: unexpected error
 	var entity auth.LoginRequest
 	if err := handlers.BindTo(w, r, &entity); err != nil {
 		return
@@ -72,6 +106,22 @@ func (s *Service) LoginCtrl(w http.ResponseWriter, r *http.Request) {
 
 // UpdateUserCtrl updates user's info
 func (s *Service) UpdateUserCtrl(w http.ResponseWriter, r *http.Request) {
+	// swagger:operation PUT /user/{username}/ user UpdateUser
+	//
+	// Update user info
+	//
+	// ---
+	// parameters:
+	// - name: user
+	//   in: body
+	//   description: user's params
+	//   schema:
+	//	   "$ref": "#/definitions/UpdateUserRequest"
+	// responses:
+	//   "200":
+	//     description: user is updated
+	//   "500":
+	//	   description: unexpected error
 	var entity auth.UpdateUserRequest
 	if err := handlers.BindTo(w, r, &entity); err != nil {
 		return
@@ -97,6 +147,23 @@ func (s *Service) UpdateUserCtrl(w http.ResponseWriter, r *http.Request) {
 
 // ResetPasswordCtrl resets user's password
 func (s *Service) ResetPasswordCtrl(w http.ResponseWriter, r *http.Request) {
+	// swagger:operation POST /user/{username}/reset_password user ResetPassword
+	//
+	// Reset user's password
+	//
+	// ---
+	// parameters:
+	// - name: username
+	//   in: path
+	//   description: username
+	//   required: true
+	//   schema:
+	//     type: string
+	// responses:
+	//   "200":
+	//     description: new password
+	//   "500":
+	//	   description: unexpected error
 	username := chi.URLParam(r, "username")
 
 	password, err := s.AuthService.ResetPassword(r.Context(), username)

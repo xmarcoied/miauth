@@ -1,3 +1,19 @@
+// Auth microservice
+//
+// This documentation describes miauth APIs
+//
+//     Schemes: https
+//	   Host: https://NONE
+//     BasePath: /api/v1
+//     Version: 1.0.1
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+// swagger:meta
 package web
 
 import (
