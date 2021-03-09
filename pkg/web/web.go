@@ -7,7 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-chi/chi"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/xmarcoied/miauth/handlers/apiv1"
@@ -29,16 +28,6 @@ func New(apiv1 *apiv1.Service) *Engine {
 		apiv1:   apiv1,
 	}
 	return webServer
-}
-
-func (s *Engine) routes() chi.Router {
-	router := chi.NewRouter()
-
-	//routes
-	router.Route("/api/v1", func(rapi chi.Router) {
-		rapi.Get("/_health", s.apiv1.HealthCtrl)
-	})
-	return router
 }
 
 // Run fire web Engine
@@ -64,12 +53,12 @@ func (s *Engine) Shutdown() error {
 	s.lock.Lock()
 	if s.httpServer != nil {
 		if err := s.httpServer.Shutdown(ctx); err != nil {
-			log.Debugf("rest shutdown error, %s", err)
+			log.Debugf("http server shutdown error, %s", err)
 			return err
 		}
 	}
 
-	log.Info("shutdown rest server completed")
+	log.Info("shutdown http server completed")
 	s.lock.Unlock()
 	return nil
 }
