@@ -23,27 +23,27 @@ func NewService(userinterface storage.UsersInterface) *Service {
 }
 
 // CreateUser create a new user and return the created user info
-func (s *Service) CreateUser(ctx context.Context, username, password string) (models.User, error) {
+func (s *Service) CreateUser(ctx context.Context, req CreateUserRequest) (models.User, error) {
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
-	hashPassword, err := s.GenerateHashPassword(password)
+	hashPassword, err := s.GenerateHashPassword(req.Password)
 	if err != nil {
 		pkg.GetLogContext(ctx).WithError(err).WithFields(log.Fields{
-			"user": username,
+			"user": req.Username,
 		}).Error("cannot create a new user")
 		return models.User{}, err
 	}
-	user, err := s.storage.CreateUser(ctx, username, hashPassword)
+	user, err := s.storage.CreateUser(ctx, req.Username, hashPassword)
 	if err != nil {
 		pkg.GetLogContext(ctx).WithError(err).WithFields(log.Fields{
-			"user": username,
+			"user": req.Username,
 		}).Error("cannot create a new user")
 		return models.User{}, err
 	}
 
 	pkg.GetLogContext(ctx).WithFields(log.Fields{
-		"user": username,
+		"user": req.Username,
 	}).Info("new user created")
 
 	return user, nil

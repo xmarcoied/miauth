@@ -24,7 +24,7 @@ func (s *Service) CreateUserCtrl(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := s.AuthService.CreateUser(r.Context(), entity.Username, entity.Password)
+	_, err := s.AuthService.CreateUser(r.Context(), entity)
 	if err != nil {
 		handlers.RenderJSONError(w, r, http.StatusBadRequest, &pkg.Error{
 			Code: pkg.ErrInternal,

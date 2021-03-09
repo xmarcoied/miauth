@@ -14,9 +14,8 @@ func TestService_CreateUser(t *testing.T) {
 		storage storage.UsersInterface
 	}
 	type args struct {
-		ctx      context.Context
-		username string
-		password string
+		ctx context.Context
+		req CreateUserRequest
 	}
 	tests := []struct {
 		name    string
@@ -31,9 +30,12 @@ func TestService_CreateUser(t *testing.T) {
 				storage: &storage.MockedUser{},
 			},
 			args: args{
-				ctx:      context.TODO(),
-				username: "username",
-				password: "password",
+				ctx: context.TODO(),
+				req: CreateUserRequest{
+					Password:        "password",
+					ConfirmPassword: "password",
+					Username:        "username",
+				},
 			},
 			want: models.User{
 				Username: "username",
@@ -52,9 +54,12 @@ func TestService_CreateUser(t *testing.T) {
 				}),
 			},
 			args: args{
-				ctx:      context.TODO(),
-				username: "username",
-				password: "password",
+				ctx: context.TODO(),
+				req: CreateUserRequest{
+					Password:        "password",
+					ConfirmPassword: "password",
+					Username:        "username",
+				},
 			},
 			want:    models.User{},
 			wantErr: true,
@@ -65,7 +70,7 @@ func TestService_CreateUser(t *testing.T) {
 			s := &Service{
 				storage: tt.fields.storage,
 			}
-			got, err := s.CreateUser(tt.args.ctx, tt.args.username, tt.args.password)
+			got, err := s.CreateUser(tt.args.ctx, tt.args.req)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Service.CreateUser() error = %v, wantErr %v", err, tt.wantErr)
 				return
