@@ -17,15 +17,11 @@ func NewMockedUser(store []models.User) *MockedUser {
 	}
 }
 
-func (m *MockedUser) CreateUser(ctx context.Context, username, password string) (models.User, error) {
-	if m.IsUserExist(username) {
+func (m *MockedUser) CreateUser(ctx context.Context, user models.User) (models.User, error) {
+	if m.IsUserExist(user.Username) {
 		return models.User{}, ErrAlreadyExist
 	}
 
-	user := models.User{
-		Username: username,
-		Password: password,
-	}
 	m.datastore = append(m.datastore, user)
 
 	return user, nil

@@ -35,7 +35,13 @@ func (s *Service) CreateUser(ctx context.Context, req CreateUserRequest) (models
 		}).Error("cannot create a new user")
 		return models.User{}, err
 	}
-	user, err := s.storage.CreateUser(ctx, req.Username, hashPassword)
+
+	user, err := s.storage.CreateUser(ctx, models.User{
+		Username:  req.Username,
+		Password:  hashPassword,
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+	})
 	if err != nil {
 		pkg.GetLogContext(ctx).WithError(err).WithFields(log.Fields{
 			"user": req.Username,

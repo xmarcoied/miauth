@@ -9,7 +9,9 @@ type CreateUserRequest struct {
 	// required: true
 	ConfirmPassword string `json:"confirm_password" validate:"eqfield=Password"`
 	// required: true
-	Username string `json:"username" validate:"required"`
+	Username  string `json:"username" validate:"required"`
+	FirstName string `json:"first_name,omitempty"`
+	LastName  string `json:"last_name,omitempty"`
 }
 
 // LoginRequest
