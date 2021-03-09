@@ -9,13 +9,13 @@ func (s *Engine) routes() chi.Router {
 	router.Route("/api/v1", func(rapi chi.Router) {
 		rapi.Get("/_health", s.apiv1.HealthCtrl)
 		rapi.Route("/user", func(ruser chi.Router) {
-			ruser.Post("/", nil)
-			ruser.Post("/login", nil)
+			ruser.Post("/", s.apiv1.CreateUserCtrl)
+			ruser.Post("/login", s.apiv1.LoginCtrl)
 
 			ruser.Route("/{id}", func(ri chi.Router) {
-				ri.Put("/", nil)
-				ri.Post("/change_password", nil)
-				ri.Post("/reset_password", nil)
+				ri.Put("/", s.apiv1.UpdateUserCtrl)
+				ri.Post("/change_password", s.apiv1.ChangePasswordCtrl)
+				ri.Post("/reset_password", s.apiv1.ResetPasswordCtrl)
 			})
 		})
 	})
